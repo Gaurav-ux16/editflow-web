@@ -43,13 +43,20 @@ export const login = createAsyncThunk(
 
 // ─── Initial state ────────────────────────────────────────────────────────
 
-const storedToken = localStorage.getItem('editflow_token');
+const defaultMockUser: User = {
+  id: 1,
+  name: 'Demo Client',
+  email: 'client@editflow.com',
+  role: 'client',
+};
+
+const storedToken = localStorage.getItem('editflow_token') || 'demo_token_bypass';
 const storedUser  = localStorage.getItem('editflow_user');
 
 const initialState: AuthState = {
-  user:            storedUser ? (JSON.parse(storedUser) as User) : null,
+  user:            storedUser ? (JSON.parse(storedUser) as User) : defaultMockUser,
   token:           storedToken,
-  isAuthenticated: !!storedToken,
+  isAuthenticated: true,
   loading:         false,
   error:           null,
 };

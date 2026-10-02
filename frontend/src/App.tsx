@@ -4,55 +4,52 @@ import { useSelector } from 'react-redux';
 import type { RootState } from './redux/store';
 
 // Pages
-import LoginPage        from './pages/LoginPage';
-import RegisterPage     from './pages/RegisterPage';
-import DashboardPage    from './pages/DashboardPage';
-import ProjectsPage     from './pages/ProjectsPage';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import DashboardPage from './pages/DashboardPage';
+import ProjectsPage from './pages/ProjectsPage';
 import CreateProjectPage from './pages/CreateProjectPage';
 import ProjectDetailPage from './pages/ProjectDetailPage';
-import EditProjectPage  from './pages/EditProjectPage';
+import EditProjectPage from './pages/EditProjectPage';
 
 // Layout
 import AppLayout from './components/layout/AppLayout';
+import ClientRoutes from './client/ClientRoutes';
 
-// ─── Protected Route helper ────────────────────────────────────────────────
+// ─── Protected Route helper (Login disabled) ──────────────────────────────
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated } = useSelector((s: RootState) => s.auth);
-  return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
-};
-
-// ─── Public Route (redirect if already logged in) ─────────────────────────
-const PublicRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated } = useSelector((s: RootState) => s.auth);
-  return isAuthenticated ? <Navigate to="/dashboard" replace /> : <>{children}</>;
+  return <>{children}</>;
 };
 
 export default function App() {
   return (
     <Routes>
-      {/* Public routes */}
-      <Route path="/login"    element={<PublicRoute><LoginPage /></PublicRoute>} />
-      <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
+      {/* Client Module (Member 1) */}
+      <Route path="/client/*" element={<ClientRoutes />} />
 
-      {/* Protected routes wrapped in AppLayout */}
+      {/* Default navigation and auth redirects */}
+      <Route path="/" element={<Navigate to="/client/dashboard" replace />} />
+      <Route path="/login" element={<Navigate to="/client/dashboard" replace />} />
+      <Route path="/register" element={<Navigate to="/client/dashboard" replace />} />
+
+      {/* Shared/Legacy routes wrapped in AppLayout */}
       <Route
-        path="/"
+        path="/legacy"
         element={
           <ProtectedRoute>
             <AppLayout />
           </ProtectedRoute>
         }
       >
-        <Route index element={<Navigate to="/dashboard" replace />} />
-        <Route path="dashboard"          element={<DashboardPage />} />
-        <Route path="projects"           element={<ProjectsPage />} />
-        <Route path="projects/create"    element={<CreateProjectPage />} />
-        <Route path="projects/:id"       element={<ProjectDetailPage />} />
-        <Route path="projects/:id/edit"  element={<EditProjectPage />} />
+        <Route path="dashboard" element={<DashboardPage />} />
+        <Route path="projects" element={<ProjectsPage />} />
+        <Route path="projects/create" element={<CreateProjectPage />} />
+        <Route path="projects/:id" element={<ProjectDetailPage />} />
+        <Route path="projects/:id/edit" element={<EditProjectPage />} />
       </Route>
 
       {/* Fallback */}
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      <Route path="*" element={<Navigate to="/client/dashboard" replace />} />
     </Routes>
   );
 }
